@@ -1,34 +1,30 @@
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
-require("dotenv").config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+app.use(cors());
 
-app.use(cors()); // Enable CORS
-
-const NEWS_API_KEY = process.env.NEWS_API_KEY; // Store API key in .env
+const NEWS_API_KEY = "a96d9eb6b93f46bc9313947bebf9bd05";
 
 app.get("/news", async (req, res) => {
-    const category = req.query.category || "general";
-    const country = req.query.country || "us";
+    const category = req.query.category || "general"; // Default category
+    const country = req.query.country || "us"; // Default country
 
     const NEWS_API_URL = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&pageSize=20&apiKey=${NEWS_API_KEY}`;
 
     try {
         const response = await axios.get(NEWS_API_URL);
         
-        res.set("Cache-Control", "no-store"); // Prevents caching
-        res.set("Expires", "-1"); // Ensures fresh data
-        res.set("Pragma", "no-cache"); // Extra protection against caching
-
+        res.set("Cache-Control", "no-store"); // Prevent caching
         res.json(response.data);
     } catch (error) {
         res.status(500).json({ error: "Failed to fetch news", details: error.message });
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+module.exports = app;
